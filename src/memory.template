@@ -1,0 +1,36 @@
+// templated memory functions go here
+
+#include "memory.h"
+#include "types.h"
+#include <assert.h>
+
+template<typename T>
+void Memory::Read(unsigned int base_address, T* buffer, size_t size)
+{
+	assert(size <= sizeof(buffer));
+
+	// data to be written to buffer.
+	uint64_t result = data_[base_address]; // get first byte
+	
+	// add on the following bytes to the result
+	for (unsigned int i = 1; i < size; i++)
+	{
+		result = (result << 8) + data_[base_address + i]; // shift over one byte and concatenate
+	}
+	
+	// write result to buffer
+	*buffer = result;
+}
+
+template<typename T>
+void Memory::Write(unsigned int base_address, T* buffer, size_t size)
+{
+	assert(size <= sizeof(buffer));
+	
+	// for each byte in the buffer
+	for (unsigned int i = 0; i < size; i++)
+	{
+		// write each byte down the memory block in decending order
+		data_[base_address + i] = *buffer >> (size - 1) * 8 - 8 * i;//((8 * (size - 1)) - 8 * i);
+	}
+}	
